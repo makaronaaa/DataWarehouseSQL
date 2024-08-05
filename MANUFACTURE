@@ -1,18 +1,18 @@
-select count(*),sysdatetime(), 'Maka Makharshvili' myname from CS689_Assign4.dbo.MANUFACTURE_FACT
+select count(*),sysdatetime(), 'Maka Makharshvili' myname from manu.dbo.MANUFACTURE_FACT
 
 select * from (
-	select SUBSTRING(CS689_Assign4.dbo.CALENDAR_MANUFACTURE_DIM.manufacture_year,3,4)year,
-	CS689_Assign4.dbo.FACTORY_DIM.FACTORY_LABEL factory_name,
-	sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed) total_units_produced,
-	sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed,
-	ROW_NUMBER()over (partition by CS689_Assign4.dbo.CALENDAR_MANUFACTURE_DIM.manufacture_year order by sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed)
+	select SUBSTRING(manu.dbo.CALENDAR_MANUFACTURE_DIM.manufacture_year,3,4)year,
+	manu.dbo.FACTORY_DIM.FACTORY_LABEL factory_name,
+	sum(manu.dbo.MANUFACTURE_FACT.qty_passed) total_units_produced,
+	sum(manu.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed,
+	ROW_NUMBER()over (partition by manu.dbo.CALENDAR_MANUFACTURE_DIM.manufacture_year order by sum(manu.dbo.MANUFACTURE_FACT.qty_passed)
 	desc) as Factory_Rank
-	from CS689_Assign4.dbo.CALENDAR_MANUFACTURE_DIM,
-	CS689_Assign4.dbo.FACTORY_DIM,
-	CS689_Assign4.dbo.MANUFACTURE_FACT
-	where CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY=CS689_Assign4.dbo.CALENDAR_MANUFACTURE_DIM.MANUFACTURE_CAL_KEY
-	and CS689_Assign4.dbo.MANUFACTURE_FACT.FACTORY_KEY=CS689_Assign4.dbo.FACTORY_DIM.FACTORY_KEY
-	group by CS689_Assign4.dbo.CALENDAR_MANUFACTURE_DIM.MANUFACTURE_YEAR, CS689_Assign4.dbo.FACTORY_DIM.FACTORY_LABEL)
+	from manu.dbo.CALENDAR_MANUFACTURE_DIM,
+	manu.dbo.FACTORY_DIM,
+	manu.dbo.MANUFACTURE_FACT
+	where manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY=manu.dbo.CALENDAR_MANUFACTURE_DIM.MANUFACTURE_CAL_KEY
+	and manu.dbo.MANUFACTURE_FACT.FACTORY_KEY=manu.dbo.FACTORY_DIM.FACTORY_KEY
+	group by manu.dbo.CALENDAR_MANUFACTURE_DIM.MANUFACTURE_YEAR, manu.dbo.FACTORY_DIM.FACTORY_LABEL)
 	where factory_rank <=3
 	order by 1 desc
 
@@ -29,8 +29,8 @@ end month
 sum(b.qty_failed) total_units_failed,
 ROW_NUMBER()over (partition by substring(b.MANUFACTURE_CAL_KEY,11,2) order by
 sum(b.qty_passed) Rank_Factory
-from CS689_Assign4.dbo.MANUFACTURE_FACT b
-join CS689_Assign4.dbo.factory_dim a on b.factory_key=a.factory_key
+from manu.dbo.MANUFACTURE_FACT b
+join manu.dbo.factory_dim a on b.factory_key=a.factory_key
 where substring (b.MANUFACTURE_CAL_KEY,6,4)='2022'
 group by rollup(a.factory_label,substring(b.MANUFACTURE_CAL_KEY,11,2))
 )
@@ -67,48 +67,48 @@ SELECT manufacture_year,factory_label,qty_passed,qty_failed,SUM(qty_passed),Mont
 
 --3
 select factory_name,brand_name month, total_units_passed, total_units_failed from(
-select CS689_Assign4.dbo.FACTORY_DIM.factory_label factory_name, CS689_Assign4.dbo.PRODUCT_DIM.brand_label brand_name
-,case when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
+select manu.dbo.FACTORY_DIM.factory_label factory_name, manu.dbo.PRODUCT_DIM.brand_label brand_name
+,case when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
 end month
-,sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed) total_units_passed
-,sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed
-,ROW_NUMBER()over (partition by CS689_Assign4.dbo.CALENDAR_MANUFACTURE_Fact.MANUFACTURE_CAL_KEY,11,2) order by
-sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed) Rank_Factory
-from CS689_Assign4.dbo.MANUFACTURE_FACT
-join CS689_Assign4.dbo.factory_dim on CS689_Assign4.dbo.MANUFACTURE_FACT.factory_key=CS689_Assign4.dbo.factory_dim.factory_key
-join CS689_Assign4.dbo.PRODUCT_DIM on CS689_Assign4.dbo.MANUFACTURE_FACT.product_key= CS689_Assign4.dbo.PRODUCT_DIM.product_key
-where substring (CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,6,4)='2021'
-group by rollup(CS689_Assign4.dbo.factory_dim.factory_label,CS689_Assign4.dbo.PRODUCT_DIM.brand_label, substring(CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2))
+,sum(manu.dbo.MANUFACTURE_FACT.qty_passed) total_units_passed
+,sum(manu.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed
+,ROW_NUMBER()over (partition by manu.dbo.CALENDAR_MANUFACTURE_Fact.MANUFACTURE_CAL_KEY,11,2) order by
+sum(manu.dbo.MANUFACTURE_FACT.qty_passed) Rank_Factory
+from manu.dbo.MANUFACTURE_FACT
+join manu.dbo.factory_dim on manu.dbo.MANUFACTURE_FACT.factory_key=manu.dbo.factory_dim.factory_key
+join manu.dbo.PRODUCT_DIM on manu.dbo.MANUFACTURE_FACT.product_key= manu.dbo.PRODUCT_DIM.product_key
+where substring (manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,6,4)='2021'
+group by rollup(manudbo.factory_dim.factory_labelmanu.dbo.PRODUCT_DIM.brand_label, substring(manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2))
 )
 where rank_factory <=3;
 
 --4
 select factory_name,brand_name month, total_units_passed, total_units_failed from(
-select CS689_Assign4.dbo.FACTORY_DIM.factory_label factory_name, CS689_Assign4.dbo.PRODUCT_DIM.brand_label brand_name
-,case when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
+select manu.dbo.FACTORY_DIM.factory_label factory_name, manu.dbo.PRODUCT_DIM.brand_label brand_name
+,case when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
 end month
-,sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed) total_units_passed
-,sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed
-,ROW_NUMBER()over (partition by CS689_Assign4.dbo.CALENDAR_MANUFACTURE_Fact.MANUFACTURE_CAL_KEY,11,2) order by
-sum(CS689_Assign4.dbo.MANUFACTURE_FACT.qty_passed) Rank_Factory
-from CS689_Assign4.dbo.MANUFACTURE_FACT
-join CS689_Assign4.dbo.factory_dim on CS689_Assign4.dbo.MANUFACTURE_FACT.factory_key=CS689_Assign4.dbo.factory_dim.factory_key
-join CS689_Assign4.dbo.PRODUCT_DIM on CS689_Assign4.dbo.MANUFACTURE_FACT.product_key= CS689_Assign4.dbo.PRODUCT_DIM.product_key
-where substring (CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,6,4)='2021'
-group by CS689_Assign4.dbo.factory_dim.factory_label,CS689_Assign4.dbo.PRODUCT_DIM.brand_label,cube(CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2))
+,sum(manu.dbo.MANUFACTURE_FACT.qty_passed) total_units_passed
+,sum(manu.dbo.MANUFACTURE_FACT.qty_failed) total_units_failed
+,ROW_NUMBER()over (partition by manu.dbo.CALENDAR_MANUFACTURE_Fact.MANUFACTURE_CAL_KEY,11,2) order by
+sum(manu.dbo.MANUFACTURE_FACT.qty_passed) Rank_Factory
+from manu.dbo.MANUFACTURE_FACT
+join manu.dbo.factory_dim on manu.dbo.MANUFACTURE_FACT.factory_key=manu.dbo.factory_dim.factory_key
+join manu.dbo.PRODUCT_DIM on manu.dbo.MANUFACTURE_FACT.product_key= manu.dbo.PRODUCT_DIM.product_key
+where substring (manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,6,4)='2021'
+group by manu.dbo.factory_dim.factory_label,manu.dbo.PRODUCT_DIM.brand_label,cube(manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2))
 where rank_factory <=3;
 
 --6
 select a.manufacture_year,3,4 year,
 b.factory_label  factory_name,
 sum(c.qty_passed) total_units_produced
-from cs689_Assign4.dbo.calendar_manufacture_dim a,
-cs689_Assign4.dbo.factory_dim b,
-cs689_Assign4.dbo.manufacture_fact c
+from manu.dbo.calendar_manufacture_dim a,
+manu.dbo.factory_dim b,
+manu.dbo.manufacture_fact c
 where c.manufacture_cal_key=a.manufacture_cal_key
 and c.factory_key=b.factory_key
 and  substring(c.manufacture_cal_key,6,4) in(2022,2021,2020,2019,2018)
@@ -121,9 +121,9 @@ select * from(
 select substring(a.manufacture_year,3,4) year,
 b.factory_label  factory_name,
 sum(c.qty_passed) total_units_produced
-from cs689_Assign4.dbo.calendar_manufacture_dim a,
-cs689_Assign4.dbo.factory_dim b,
-cs689_Assign4.dbo.manufacture_fact c
+from manu.dbo.calendar_manufacture_dim a,
+manu.dbo.factory_dim b,
+manu.dbo.manufacture_fact c
 where c.manufacture_cal_key=a.manufacture_cal_key
 and c.factory_key=b.factory_key
 and  substring(c.manufacture_cal_key,6,4) in(2022,2021,2020,2019,2018)
@@ -143,10 +143,10 @@ SELECT * FROM produced WHERE ranks<=3
 
 
 select factory_name,brand_name month, total_units_passed, total_units_failed from(
-select CS689_Assign4.dbo.FACTORY_DIM.factory_label factory_name, CS689_Assign4.dbo.PRODUCT_DIM.brand_label brand_name
-,case when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
-when CS689_Assign4.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
+select manu.dbo.FACTORY_DIM.factory_label factory_name, manu.dbo.PRODUCT_DIM.brand_label brand_name
+,case when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='01' then '01-January'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='02' then '02-February'
+when manu.dbo.MANUFACTURE_FACT.MANUFACTURE_CAL_KEY,11,2)='03' then '03-March'
 end month,
 ROW_NUMBER() OVER(PARTITION BY factory_dim.factory_label ORDER BY manufacture_fact.qty_passed DESC)  
  AS ranks FROM  factory_dim  
